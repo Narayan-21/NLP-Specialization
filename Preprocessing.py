@@ -2,6 +2,7 @@ import nltk
 from nltk.corpus import twitter_samples
 import matplotlib.pyplot as plt
 import random
+import numpy as np
 
 import re
 import string
@@ -14,14 +15,7 @@ nltk.download('stopwords')
 
 all_pos_twts = twitter_samples.strings("positive_tweets.json")
 all_neg_twts = twitter_samples.strings("negative_tweets.json")
-
-#print('Number of Positive tweets: ', len(all_pos_twts))
-#print('Number of Negative tweets: ', len(all_neg_twts))
-
-#Looking at random positive and negative tweets
-#print('Positive Tweet: ', all_pos_twts[random.randint(0,5000)])
-#print('Negative Tweet: ', all_neg_twts[random.randint(0,5000)])
-
+tweets = all_pos_twts + all_neg_twts
 
 def process_tweet(tweet):
     stemmer = PorterStemmer()
@@ -50,9 +44,21 @@ def process_tweet(tweet):
 
     return tweets_clean
 
-tweet1 = all_neg_twts[random.randint(0, len(all_neg_twts))]
-print('Original Negative tweet:', tweet1)
-print('Processed Negative tweet: ', process_tweet(tweet1))
-tweet2 = all_pos_twts[random.randint(0, len(all_pos_twts))]
-print('Original Positive tweet:', tweet2)
-print('Processed Positive tweet: ', process_tweet(tweet2))
+
+def build_freqs(tweets, ys):
+    yslist = np.squeeze(ys).tolist() # The input ys is an m X 1 array with the sentiment label of each tweet
+    freqs = {}
+    for y, tweet in zip(yslist, tweets):
+        for word in process_tweet(tweet):
+            pair = (word, y)
+            if pair in freqs:
+                freqs[pair] += 1
+            else:
+                freqs[pair] = 1
+
+    return freqs
+
+labels = np.append(np.ones((len(all_pos_twts))), np.zeros((len(all_neg_twts))))
+print(labels)
+
+freqs = build_freqs(tweets, labels)
