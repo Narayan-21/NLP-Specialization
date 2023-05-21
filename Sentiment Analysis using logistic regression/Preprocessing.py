@@ -58,7 +58,14 @@ def build_freqs(tweets, ys):
 
     return freqs
 
-labels = np.append(np.ones((len(all_pos_twts))), np.zeros((len(all_neg_twts))))
-print(labels)
+def extract_features(tweet, freqs, process_tweet=process_tweet):
+    word_l  = process_tweet(tweet)
+    x = np.zeros(3)
+    x[0] = 1
+    for word in word_l:
+        x[1] += freqs.get((word, 1.0),0)
+        x[2] += freqs.get((word, 0.0),0)
+    x = x[None, :]
+    return x
 
-freqs = build_freqs(tweets, labels)
+labels = np.append(np.ones((len(all_pos_twts))), np.zeros((len(all_neg_twts))))
