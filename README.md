@@ -1,1 +1,1 @@
-# NLP-stuff
+# NLP Specialization course by Deeplearning.AI
